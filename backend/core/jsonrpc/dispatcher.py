@@ -63,7 +63,7 @@ class Dispatcher:
         except Exception as exc:  # noqa: BLE001 — never leak internals to the client
             from core.logging import get_logger
 
-            get_logger("jsonrpc").error("dispatch failure", extra={"exc": str(exc)})
+            get_logger("jsonrpc").error("dispatch failure: %s", exc)
             return _error(-32603, "Internal error", raw.get("id") if isinstance(raw, dict) else None)
 
     async def _handle(self, raw: dict, auth_header: str | None) -> dict:

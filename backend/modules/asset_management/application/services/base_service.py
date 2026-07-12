@@ -44,6 +44,11 @@ class BaseService:
 
     async def create(self, **kwargs):
         kwargs = apply_field_permissions(self.ctx, self.model_name, kwargs, "write")
+        # Auto-scope new records to the caller's company unless explicitly provided.
+        if self.ctx.company_id is not None and "company_id" not in kwargs:
+            cols = {c.name for c in self.orm_model.__table__.columns}
+            if "company_id" in cols:
+                kwargs["company_id"] = self.ctx.company_id
         obj = await self.repo.create(kwargs)
         return self._to_dict(obj)
 

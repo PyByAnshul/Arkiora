@@ -26,6 +26,23 @@ class AssetService(BaseService):
         super().__init__(session, ctx)
         self.allocation_repo = BaseRepository(session, Allocation)
 
+    async def create(self, **kwargs):
+        # `code` is a generated, read-only field in the UI (asset_form_metadata) but is
+        # NOT NULL in the DB. Auto-generate it (AST-0001, AST-0002, …) when omitted so the
+        # form-driven create path works without sending a value.
+        if not kwargs.get("code"):
+            kwargs["code"] = await self._next_code()
+        return await super().create(**kwargs)
+
+    async def _next_code(self) -> str:
+        from sqlalchemy import func, select
+
+        stmt = select(func.count()).select_from(self.orm_model)
+        if self.ctx.company_id is not None:
+            stmt = stmt.where(self.orm_model.company_id == self.ctx.company_id)
+        total = (await self.session.execute(stmt)).scalar_one()
+        return f"AST-{total + 1:04d}"
+
     async def allocate(self, **kwargs):
         """Custom method `asset.allocate` (FR-AL-01..04)."""
         params = AllocateSchema(**kwargs)

@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import reticleNext from "@reticlehq/next";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "";
 
@@ -13,4 +14,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default reticleNext.withReticle(nextConfig);

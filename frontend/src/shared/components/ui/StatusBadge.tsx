@@ -1,35 +1,54 @@
 import { cn } from "@/lib/utils";
 
+// Luminous Enterprise pastel badge palette:
+// Each status maps to a (bg, text) pastel pair per the design spec
 const STATUS_STYLES: Record<string, string> = {
-  // Asset lifecycle (per design system)
-  draft: "bg-surface-container text-on-surface-variant",
-  active: "bg-success-container text-success",
-  under_maintenance: "bg-warning-container text-warning",
-  disposed: "bg-error-container text-error",
-  written_off: "bg-error-container text-error",
-  // Allocation / generic
-  pending: "bg-info-container text-info",
-  requested: "bg-info-container text-info",
-  approved: "bg-info-container text-info",
-  allocated: "bg-success-container text-success",
-  returned: "bg-surface-container text-on-surface-variant",
-  resolved: "bg-success-container text-success",
-  closed: "bg-surface-container text-on-surface-variant",
-  open: "bg-warning-container text-warning",
-  in_progress: "bg-warning-container text-warning",
-  planned: "bg-info-container text-info",
-  in_review: "bg-info-container text-info",
-  completed: "bg-success-container text-success",
-  rejected: "bg-error-container text-error",
-  cancelled: "bg-surface-container text-on-surface-variant",
+  // Asset lifecycle
+  draft:             "bg-surface-container-high     text-on-surface-variant",
+  active:            "bg-emerald-100                text-emerald-800",
+  under_maintenance: "bg-amber-100                  text-amber-800",
+  disposed:          "bg-rose-100                   text-rose-800",
+  written_off:       "bg-rose-100                   text-rose-800",
+
+  // Allocation / requests
+  pending:    "bg-blue-50   text-blue-700",
+  requested:  "bg-blue-50   text-blue-700",
+  approved:   "bg-emerald-50 text-emerald-700",
+  allocated:  "bg-emerald-100 text-emerald-800",
+  returned:   "bg-surface-container text-on-surface-variant",
+  rejected:   "bg-rose-100  text-rose-800",
+  cancelled:  "bg-surface-container text-on-surface-variant",
+
+  // Work orders / maintenance
+  open:        "bg-amber-50  text-amber-700",
+  in_progress: "bg-amber-100 text-amber-800",
+  resolved:    "bg-emerald-100 text-emerald-800",
+  closed:      "bg-surface-container text-on-surface-variant",
+
+  // Audits / cycles
+  planned:    "bg-violet-50  text-violet-700",
+  in_review:  "bg-violet-100 text-violet-800",
+  completed:  "bg-emerald-100 text-emerald-800",
+};
+
+const LABEL_MAP: Record<string, string> = {
+  under_maintenance: "Maintenance",
+  in_progress:       "In Progress",
+  written_off:       "Written Off",
+  in_review:         "In Review",
 };
 
 export function StatusBadge({ status }: { status?: string | null }) {
   if (!status) return null;
-  const cls = STATUS_STYLES[status] ?? "bg-surface-container text-on-surface-variant";
+  const cls    = STATUS_STYLES[status] ?? "bg-surface-container text-on-surface-variant";
+  const label  = LABEL_MAP[status] ?? status.replace(/_/g, " ");
+
   return (
-    <span className={cn("inline-flex items-center rounded-full px-2.5 py-0.5 text-label-md font-medium", cls)}>
-      {status.replace(/_/g, " ")}
+    <span className={cn(
+      "badge capitalize",
+      cls
+    )}>
+      {label}
     </span>
   );
 }

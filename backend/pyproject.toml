@@ -1,0 +1,33 @@
+[project]
+name = "assetflow-backend"
+version = "1.0.0"
+description = "ERP Framework backend — AssetFlow (Asset Management) module. Clean Architecture + DDD."
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "sqlalchemy[asyncio]>=2.0",
+    "asyncpg>=0.29",
+    "psycopg[binary]>=3.1",
+    "alembic>=1.13",
+    "pydantic>=2.7",
+    "pydantic-settings>=2.3",
+    "python-jose[cryptography]>=3.3",
+    "argon2-cffi>=23.1",
+    "redis>=5.0",
+    "python-multipart>=0.0.9",
+]
+
+[project.optional-dependencies]
+dev = ["ruff>=0.5", "mypy>=1.10", "pytest>=8.0", "pytest-asyncio>=0.23"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

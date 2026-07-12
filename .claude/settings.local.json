@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(PYTHONPATH=. python3 tests/smoke_test.py)",
+      "Bash(PYTHONPATH=. python3 -c ' *)",
+      "Bash(.venv/bin/python --version)",
+      "Read(//usr/bin/**)",
+      "Read(//usr/local/bin/**)",
+      "Bash(.venv/bin/python -m pip --version)",
+      "Bash(.venv/bin/python -m pip install --quiet --upgrade pip)",
+      "Bash(.venv/bin/python -m pip install --quiet \"fastapi>=0.115\" \"uvicorn[standard]>=0.30\" \"sqlalchemy[asyncio]>=2.0\" \"asyncpg>=0.29\" \"psycopg[binary]>=3.1\" \"alembic>=1.13\" \"pydantic>=2.7\" \"pydantic-settings>=2.3\" \"python-jose[cryptography]>=3.3\" \"argon2-cffi>=23.1\" \"redis>=5.0\" \"python-multipart>=0.0.9\")",
+      "Bash(echo \"EXIT=$?\")",
+      "Bash(PYTHONPATH=. .venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000 --log-level warning)",
+      "Bash(echo \"uvicorn pid $!\")",
+      "Bash(curl -s http://localhost:8000/health/live)",
+      "Read(//tmp/**)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8000/health/live)",
+      "Bash(PYTHONPATH=. .venv/bin/alembic downgrade base)",
+      "Bash(PYTHONPATH=. .venv/bin/alembic upgrade head)",
+      "Bash(PYTHONPATH=. .venv/bin/python scripts/seed.py)",
+      "Bash(pkill -f \"uvicorn main:app\")",
+      "Bash(curl -s -o /dev/null -w \"server health: %{http_code}\\\\n\" http://localhost:8000/health/live)",
+      "Bash(PYTHONPATH=. .venv/bin/python tests/smoke_test.py)"
+    ]
+  }
+}

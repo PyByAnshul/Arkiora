@@ -1,17 +1,13 @@
 import type { NextConfig } from "next";
 import reticleNext from "@reticlehq/next";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "";
-
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   // Lint is run separately; don't fail production builds on style rules.
   eslint: { ignoreDuringBuilds: true },
-  // Proxy API calls to the backend in dev so the browser can use same-origin "/api/*".
-  async rewrites() {
-    if (!API_BASE) return [];
-    return [{ source: "/api/:path*", destination: `${API_BASE}/api/:path*` }];
-  },
+  // No rewrites needed — the frontend uses NEXT_PUBLIC_API_BASE to call the backend
+  // directly (e.g. http://localhost:8000). Next.js App Router would intercept
+  // /api/* rewrites as page routes before proxying them, causing 404s.
 };
 
 export default reticleNext.withReticle(nextConfig);

@@ -38,7 +38,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     // canvas = Level 0 bone-white (#E5E5E2) per Luminous spec
-    <div className="flex h-screen overflow-hidden bg-canvas">
+    <div className="flex h-screen overflow-hidden" style={{ backgroundColor: "#E5E5E2" }}>
       <Sidebar />
       <div className="flex flex-1 flex-col overflow-hidden">
         <Topbar title={titleFor(pathname)} />

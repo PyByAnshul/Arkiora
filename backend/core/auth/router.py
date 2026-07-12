@@ -18,7 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_session
 from core.security.jwt import create_access_token, create_refresh_token, decode_token
-from core.security.password import verify_password
+from core.security.password import hash_password, verify_password
 from infrastructure.orm.core_models import Session, User
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
@@ -54,6 +54,20 @@ def _clear_failures(key: str) -> None:
 # Schemas
 # ---------------------------------------------------------------------------
 
+class RegisterIn(BaseModel):
+    email: EmailStr
+    password: str
+    first_name: str | None = None
+    last_name: str | None = None
+
+
+class RegisterOut(BaseModel):
+    id: str
+    email: str
+    first_name: str | None
+    last_name: str | None
+
+
 class LoginIn(BaseModel):
     email: str
     password: str
@@ -85,6 +99,42 @@ def _exp_from_token(token: str) -> datetime:
 # ---------------------------------------------------------------------------
 # Routes
 # ---------------------------------------------------------------------------
+
+@router.post("/register", response_model=RegisterOut, status_code=201)
+async def register(
+    payload: RegisterIn,
+    session: AsyncSession = Depends(get_session),
+):
+    """Create a new user account (FR-AUTH-00). Email must be unique."""
+    # Check for existing user — constant-time-ish: we query before hashing.
+    existing = (
+        await session.execute(select(User).where(User.email == payload.email))
+    ).scalar_one_or_none()
+    if existing is not None:
+        raise HTTPException(status_code=409, detail="An account with that email already exists.")
+
+    # Password length guard (min 8 chars).
+    if len(payload.password) < 8:
+        raise HTTPException(status_code=422, detail="Password must be at least 8 characters.")
+
+    user = User(
+        email=payload.email,
+        hashed_password=hash_password(payload.password),
+        first_name=payload.first_name,
+        last_name=payload.last_name,
+        is_active=True,
+        is_superadmin=False,
+    )
+    session.add(user)
+    await session.commit()
+    await session.refresh(user)
+    return RegisterOut(
+        id=str(user.id),
+        email=user.email,
+        first_name=user.first_name,
+        last_name=user.last_name,
+    )
+
 
 @router.post("/login", response_model=TokenOut)
 async def login(
